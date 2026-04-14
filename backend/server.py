@@ -236,6 +236,15 @@ async def get_admin_user(current_user: User = Depends(get_current_user)):
 sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
 fastapi_app = FastAPI()
 
+# CORS middleware - MUST be added before routes for proper registration
+fastapi_app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 active_users = {}
 
 @sio.event
@@ -1998,13 +2007,6 @@ async def admin_delete_club(club_id: str, admin: User = Depends(get_admin_user))
 async def admin_get_club_posts(club_id: str, admin: User = Depends(get_admin_user)):
     return await db.club_posts.find({"club_id": club_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
 
-fastapi_app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 scheduler = AsyncIOScheduler()
 
 async def delete_expired_events():
