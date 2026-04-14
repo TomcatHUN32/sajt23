@@ -2,9 +2,8 @@
 
 ## Eredeti Probléma
 - GitHub repo: https://github.com/TomcatHUN32/j4
-- A klub és marketplace funkciók nem működtek (404 hibaüzenet)
-- CORS middleware rossz helyen volt a server.py-ban
-- Oldal gyorsítás kérése
+- A klub és marketplace funkciók 404-et adtak
+- CORS middleware rossz helyen volt
 
 ## Tech Stack
 - **Backend**: Python FastAPI + Motor (MongoDB async driver)
@@ -14,40 +13,34 @@
 
 ## Elvégzett Javítások
 
-### 1. CORS middleware áthelyezés (FŐ HIBA - 404 ok)
-A CORS middleware a fájl végén volt (route-ok UTÁN), ami egyes szerver konfigurációknál 404-et okoz. Áthelyezve közvetlenül a FastAPI app létrehozása utánra.
+### Session 1 - Bug fixek
+1. CORS middleware áthelyezés (404 ok)
+2. Klubok: saját pending klubok megjelenítése
+3. N+1 query optimalizáció
+4. Hiányzó address mező javítás
+5. MongoDB indexek + React lazy loading
 
-### 2. Klubok nem jelentek meg
-`GET /api/clubs` csak "approved" klubokat mutatott. Most a felhasználó saját pending klubjait is látja.
-
-### 3. N+1 query optimalizáció
-Klubok betöltéséhez batch membership lookup.
-
-### 4. Hiányzó address mező
-Event létrehozásnál az address mező nem került mentésre.
-
-### 5. MongoDB indexek + React lazy loading
-Teljesítmény optimalizáció.
-
-## Production .env konfiguráció
-- MONGO_URL=mongodb://localhost:27017
-- DB_NAME=tuningtalalkozok
-- CORS_ORIGINS=https://tuningtalalkozok.hu,https://www.tuningtalalkozok.hu
-- JWT_SECRET=beállítva
-- RESEND_API_KEY=beállítva
-- SENDER_EMAIL=noreply@tuningtalalkozok.hu
-- FRONTEND_URL=https://tuningtalalkozok.hu
+### Session 2 - Új funkciók
+1. **Eladva jelölés**: PUT /api/marketplace/listings/{id}/mark-sold (toggle)
+   - ELADVA badge a kártyákon
+   - Áthúzott ár az eladott hirdetéseknél
+   - Visszavonható jelölés
+2. **Üzenet küldése eladónak**: 
+   - Marketplace-ből közvetlenül a Messages oldalra navigál az eladó adataival
+   - ChatWindow megnyílik az eladóval
+   - Nem kell ismerősnek lenni az üzenetküldéshez
 
 ## Tesztelési Eredmények
-- Backend: 90% (18/20)
+- Backend: 90.9% (20/22)
 - Frontend: 100%
-- Összesített: 95%
+- Új funkciók: 100%
 
-## Következő Lépések (P1)
-1. Production deployment az új kóddal
-2. Frontend image compression
+## Következő Lépések
+1. Production deployment (sajt22 repo -> tuningtalalkozok.hu)
+2. Képek tömörítése (Cloudinary)
 
-## Backlog (P2)
-- SEO meta tagek
-- PWA support
+## Backlog
+- Kiemelt hirdetés a piactéren
+- Autó profil oldal
 - Push értesítések
+- Galéria funkció
