@@ -1,0 +1,128 @@
+{
+  "timestamp": "2026-04-14T16:14:57.758114",
+  "total_tests": 20,
+  "passed_tests": 18,
+  "success_rate": 90.0,
+  "results": [
+    {
+      "test": "Admin Login",
+      "success": true,
+      "details": "User ID: user_x4hxujqy7w85",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/clubs",
+      "success": true,
+      "details": "Returned 3 clubs",
+      "response_data": null
+    },
+    {
+      "test": "POST /api/clubs",
+      "success": true,
+      "details": "Created club: club_rhuo76xeuffk",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/clubs/{club_id}",
+      "success": true,
+      "details": "Club status: pending",
+      "response_data": null
+    },
+    {
+      "test": "POST /api/clubs/{club_id}/join",
+      "success": false,
+      "details": "{'detail': 'Klub nem tal\u00e1lhat\u00f3'}",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/clubs/{club_id}/members",
+      "success": true,
+      "details": "Members count: 1",
+      "response_data": null
+    },
+    {
+      "test": "POST /api/clubs/{club_id}/posts",
+      "success": true,
+      "details": "Post ID: cpost_xxfc1jk8yy24",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/clubs/{club_id}/posts",
+      "success": true,
+      "details": "Posts count: 1",
+      "response_data": null
+    },
+    {
+      "test": "POST /api/clubs/{club_id}/leave",
+      "success": false,
+      "details": "{'detail': 'A tulajdonos nem hagyhatja el a klubot'}",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/marketplace/listings",
+      "success": true,
+      "details": "Returned 3 listings",
+      "response_data": null
+    },
+    {
+      "test": "POST /api/marketplace/listings",
+      "success": true,
+      "details": "Created listing: listing_swoa0lc87f3c",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/marketplace/listings/{listing_id}",
+      "success": true,
+      "details": "Views: 1",
+      "response_data": null
+    },
+    {
+      "test": "POST /api/marketplace/listings/{listing_id}/favorite",
+      "success": true,
+      "details": "Hozz\u00e1adva a kedvencekhez",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/marketplace/favorites",
+      "success": true,
+      "details": "Favorites count: 1",
+      "response_data": null
+    },
+    {
+      "test": "DELETE /api/marketplace/listings/{listing_id}",
+      "success": true,
+      "details": "Hirdet\u00e9s t\u00f6r\u00f6lve",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/admin/clubs",
+      "success": true,
+      "details": "Total clubs: 4",
+      "response_data": null
+    },
+    {
+      "test": "PUT /api/admin/clubs/{club_id}/approve",
+      "success": true,
+      "details": "Klub j\u00f3v\u00e1hagyva",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/admin/marketplace/listings",
+      "success": true,
+      "details": "Total listings: 3",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/users/{user_id}",
+      "success": true,
+      "details": "Username: testuser1",
+      "response_data": null
+    },
+    {
+      "test": "GET /api/auth/me",
+      "success": true,
+      "details": "Role: 1",
+      "response_data": null
+    }
+  ]
+}
