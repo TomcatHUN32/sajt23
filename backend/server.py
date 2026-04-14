@@ -1662,7 +1662,7 @@ async def get_listings(
     sort: Optional[str] = "newest",
     current_user: User = Depends(get_current_user)
 ):
-    query = {"status": "approved"}
+    query = {"status": {"$in": ["approved", "sold"]}}
     if category:
         query["category"] = category
     if condition:
@@ -1736,6 +1736,17 @@ async def toggle_favorite(listing_id: str, current_user: User = Depends(get_curr
         await db.listing_favorites.insert_one({"listing_id": listing_id, "user_id": current_user.user_id, "created_at": datetime.now(timezone.utc).isoformat()})
         await db.listings.update_one({"listing_id": listing_id}, {"$inc": {"favorites_count": 1}})
         return {"message": "Hozzáadva a kedvencekhez", "favorited": True}
+
+@fastapi_app.put("/api/marketplace/listings/{listing_id}/mark-sold")
+async def mark_listing_sold(listing_id: str, current_user: User = Depends(get_current_user)):
+    listing = await db.listings.find_one({"listing_id": listing_id}, {"_id": 0})
+    if not listing:
+        raise HTTPException(status_code=404, detail="Hirdetés nem található")
+    if listing["user_id"] != current_user.user_id and current_user.role != 1:
+        raise HTTPException(status_code=403, detail="Nincs jogosultság")
+    new_status = "sold" if listing.get("status") != "sold" else "approved"
+    await db.listings.update_one({"listing_id": listing_id}, {"$set": {"status": new_status}})
+    return {"message": "Eladva jelölés frissítve", "status": new_status}
 
 @fastapi_app.get("/api/marketplace/favorites")
 async def get_favorites(current_user: User = Depends(get_current_user)):

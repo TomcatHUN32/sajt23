@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import {
   ShoppingBag, Search, Heart, Plus, MapPin, Tag, Filter,
-  Eye, X, Image as ImageIcon, Trash2, ChevronDown
+  Eye, X, Image as ImageIcon, Trash2, ChevronDown, CheckCircle, MessageCircle
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -133,6 +133,15 @@ export const Marketplace = () => {
     } catch (e) { toast.error('Hiba'); }
   };
 
+  const handleMarkSold = async (listingId) => {
+    try {
+      const res = await api.put(`/marketplace/listings/${listingId}/mark-sold`);
+      toast.success(res.data.status === 'sold' ? 'Eladva jelölve!' : 'Eladva jelölés visszavonva');
+      setSelectedListing(prev => prev ? { ...prev, status: res.data.status } : null);
+      fetchListings();
+    } catch (e) { toast.error('Hiba'); }
+  };
+
   const openListing = async (listingId) => {
     try {
       const res = await api.get(`/marketplace/listings/${listingId}`);
@@ -218,8 +227,13 @@ export const Marketplace = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {displayListings.map(listing => (
-              <Card key={listing.listing_id} className="bg-zinc-900/80 border-white/10 hover:border-primary/30 transition cursor-pointer overflow-hidden"
+              <Card key={listing.listing_id} className={`bg-zinc-900/80 border-white/10 hover:border-primary/30 transition cursor-pointer overflow-hidden relative ${listing.status === 'sold' ? 'opacity-70' : ''}`}
                 onClick={() => openListing(listing.listing_id)} data-testid="listing-card">
+                {listing.status === 'sold' && (
+                  <div className="absolute top-3 left-3 z-10 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />ELADVA
+                  </div>
+                )}
                 {listing.images?.[0] ? (
                   <img src={listing.images[0]} alt={listing.title} className="w-full h-48 object-cover" loading="lazy" />
                 ) : (
@@ -326,8 +340,13 @@ export const Marketplace = () => {
             <div className="p-6 space-y-4">
               <div className="flex justify-between items-start">
                 <div>
+                  {selectedListing.status === 'sold' && (
+                    <span className="inline-flex items-center gap-1 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-2">
+                      <CheckCircle className="w-3 h-3" />ELADVA
+                    </span>
+                  )}
                   <h2 className="text-2xl font-bold text-white">{selectedListing.title}</h2>
-                  <p className="text-3xl font-bold text-primary mt-1">{selectedListing.price?.toLocaleString()} Ft</p>
+                  <p className={`text-3xl font-bold mt-1 ${selectedListing.status === 'sold' ? 'text-zinc-500 line-through' : 'text-primary'}`}>{selectedListing.price?.toLocaleString()} Ft</p>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => toggleFavorite(selectedListing.listing_id)}
@@ -335,9 +354,16 @@ export const Marketplace = () => {
                     <Heart className={`w-4 h-4 ${selectedListing.is_favorited ? 'fill-red-500' : ''}`} />
                   </Button>
                   {(selectedListing.user_id === user?.user_id || user?.role === 1) && (
-                    <Button variant="destructive" onClick={() => handleDelete(selectedListing.listing_id)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <>
+                      <Button variant="outline" onClick={() => handleMarkSold(selectedListing.listing_id)}
+                        className={selectedListing.status === 'sold' ? 'border-green-500 text-green-400' : 'border-yellow-500 text-yellow-400'}
+                        data-testid="mark-sold-btn">
+                        <CheckCircle className="w-4 h-4 mr-1" />{selectedListing.status === 'sold' ? 'Visszavon' : 'Eladva'}
+                      </Button>
+                      <Button variant="destructive" onClick={() => handleDelete(selectedListing.listing_id)}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
@@ -363,8 +389,16 @@ export const Marketplace = () => {
                 <button onClick={() => navigate(`/profile/${selectedListing.user_id}`)}
                   className="text-sm text-zinc-400 hover:text-white">Eladó: <span className="font-semibold text-white">{selectedListing.username}</span></button>
                 {selectedListing.user_id !== user?.user_id && (
-                  <Button onClick={() => { setSelectedListing(null); navigate('/messages'); }}
-                    className="bg-primary hover:bg-orange-600">Üzenet küldése</Button>
+                  <Button onClick={() => {
+                    const sellerId = selectedListing.user_id;
+                    const sellerName = selectedListing.username;
+                    const sellerPic = selectedListing.profile_pic || '';
+                    setSelectedListing(null);
+                    navigate(`/messages?userId=${sellerId}&username=${encodeURIComponent(sellerName)}&profilePic=${encodeURIComponent(sellerPic)}`);
+                  }}
+                    className="bg-primary hover:bg-orange-600" data-testid="message-seller-btn">
+                    <MessageCircle className="w-4 h-4 mr-2" />Üzenet küldése
+                  </Button>
                 )}
               </div>
             </div>

@@ -194,6 +194,16 @@ class TuningCommunityAPITester:
             self.log_test("GET /api/marketplace/favorites", success,
                          f"Favorites count: {len(response) if isinstance(response, list) else 0}" if success else str(response))
             
+            # Test PUT /api/marketplace/listings/{listing_id}/mark-sold - Mark as sold (toggle)
+            success, response = self.make_request('PUT', f'marketplace/listings/{self.created_listing_id}/mark-sold', {})
+            self.log_test("PUT /api/marketplace/listings/{listing_id}/mark-sold", success,
+                         f"Status: {response.get('status', '')}" if success else str(response))
+            
+            # Test mark-sold toggle back (should return to approved)
+            success, response = self.make_request('PUT', f'marketplace/listings/{self.created_listing_id}/mark-sold', {})
+            self.log_test("PUT /api/marketplace/listings/{listing_id}/mark-sold (toggle back)", success,
+                         f"Status: {response.get('status', '')}" if success else str(response))
+            
             # Test DELETE /api/marketplace/listings/{listing_id} - Delete listing
             success, response = self.make_request('DELETE', f'marketplace/listings/{self.created_listing_id}', expected_status=200)
             self.log_test("DELETE /api/marketplace/listings/{listing_id}", success,
